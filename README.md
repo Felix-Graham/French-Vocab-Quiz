@@ -1,14 +1,13 @@
-                           How to Set Up The French Vocab Quiz Script
+# How to Set Up The French Vocab Quiz Script
 
 
-                                          Disclaimer:
+### Disclaimer:
                              Whilst its intended use is for learning
                              vocabulary, it is also possible to use
                               the script for flashcards, provided the
                              given document follows the right syntax.
 
-
-                                          Contents:
+## Contents:
 
                                - Downloading and Installation
                                - Setting up the Script
@@ -19,8 +18,7 @@
 
 
 
-
-                     Downloading & Installation
+### Downloading & Installation
  
 Having asked for the script and its counterparts, I will most likely email you in the ensuing 48 hours. When
 you receive this email, you must download the base, packaged as `vocab_quiz.txt` (.txt for ease of downloading).
@@ -28,16 +26,15 @@ It is also advisable to download the attatched vocab files for out of the box us
 of these files to you main file system, it is recommended to create files to sort the scripts and vocab. Below is
 my ideal layout for the above:
 
-                ________
-            >--| script |
- ________   |
-| french | ⤭
-            |   ________ 
-            >--| vocab  |
+
+├── scripts
+|     ├── vocab_quiz.py
+└── vocab
+ ├── test.txt
+    ├── vocab_1-1.txt
 
 
-
-                     Setting up the Script
+### Setting up the Script
 
 Since I set up the script to match my system's file layout, there are a few lines which will need to be modified to
 match your own. Hopefully the python is well documented enough to have pointed out the following lines, but if not:
@@ -58,7 +55,7 @@ your file navigator or terminal.
 
 
 
-                     Running and Using the Script
+### Running and Using the Script
 
 To run the script, use the following syntax:
 
@@ -79,7 +76,7 @@ Additionally I will continue to update the script with new features as I please,
 
 
 
-                     Vocab Files
+### Vocab Files
 
 As I mentioned before, there is a specific format to the vocab files due to the way in which they are handled with the code.
 The first two lines are irrelevant, and usually have the title and an empty line for clarity. After this, the first line of
@@ -90,7 +87,7 @@ file for each week. Up to you.
 
 
 
-                     Flashcard Expansion
+### Flashcard Expansion
 
 Due to the way that the code works, it is definitely possible to have flashcards. If you use the format described in the above
 section, you can figure out how to acheive this. It boils down to:
