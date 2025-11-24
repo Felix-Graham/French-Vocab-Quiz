@@ -57,7 +57,7 @@ your file navigator or terminal.
 
 ### Running and Using the Script
 
-To run the script, use the following syntax:
+To run the script, use the following syntax inside of your terminal (cmd on windows):
 
     python3 vocab_quiz.py vocab_3-2.txt
 
