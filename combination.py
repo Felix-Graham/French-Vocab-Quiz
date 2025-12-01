@@ -54,7 +54,10 @@ def getfiles(choice):
                 selection = int(selection)
                 chosenfiles.append(files[selection-1])
                 files.remove(files[selection-1])
-        #print(chosenfiles) #proof that above selection works
+                os.system("clear")
+                for i in range(len(files)):
+                    print(f"{i+1}: {files[i]}")
+        print(chosenfiles) #proof that above selection works
         return chosenfiles
 
 
@@ -83,7 +86,7 @@ def merge(files):
     os.chdir("/home/rhemus/french/vocab/")
     total = []
     if len(files) > 1:
-        for i in range(len(files)-1):
+        for i in range(len(files)):
             f = files[i]
             print(i)
             print(f)
