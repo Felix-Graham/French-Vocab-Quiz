@@ -4,6 +4,79 @@ import os
 import argparse
 
 
+
+##############
+# menu page  #
+##############
+
+def plug():
+    os.system("clear")
+    print("French Vocabulary Quiz\n")
+    print("Written by Felix Graham\n")
+    print("https://github.com/Felix-Graham/French-Vocab-Quiz")
+    print("\n\n")
+    enter = input()
+    os.system("clear")
+
+def home():
+    os.system("clear")
+    print("""                      Home                    
+
+
+            Commands (c)
+
+            Start (s)
+            
+            Update (u)
+            
+            Quit (q)
+
+          """)
+
+    opt = input("\t")
+    if opt == "c":
+        commands()
+    elif opt == "s":
+        main(start())
+    elif opt == "u":
+        update()
+    elif opt == "q":
+        quit()
+    else:
+        home()
+
+
+def start():
+    os.system("clear")
+    
+    print("Select quiz type:")
+    print("1) Traditional (type answer)")
+    print("2) Multiple choice")
+    type = input("> ")
+
+    return type
+
+
+def commands():
+    os.system("clear")
+    print("""   Basic commands for people who want to bypass the menu:
+    
+            These are for typing in the command to the terminal.
+
+            python3 quiz.py select -> starts the quiz in select mode
+            python3 quiz.py all -> starts the quiz in all 
+            python3 quiz.py load -> loads the config file 
+            python3 quiz.py update -> updates the script 
+            python3 quiz.py start -> opens to main menu
+
+            
+          """)
+    x = input()
+    os.system("clear")
+    home()
+    pass
+
+
 ##############
 # autoupdate #
 ##############
@@ -27,6 +100,8 @@ def update():
             os.system("gh repo clone Felix-Graham/French-Vocab-Quiz")
     finally:
         print("Updated (in theory)")
+        time.sleep(1)
+    home()
 
 
 
@@ -185,6 +260,7 @@ def regular_quiz(num, vocab_list):
             print("Correct!\n")
         
         #time.sleep(0.5)
+    home()
 
 def continuous_quiz(vocab_list):
     print("Continuous Mode - Press Ctrl+C to exit\n")
@@ -214,6 +290,7 @@ def continuous_quiz(vocab_list):
             #time.sleep(0.3)
     except KeyboardInterrupt:
         print("\n\nQuiz ended!")
+        home()
 
 def multi_choice_quiz(vocab_list, num_questions):
     
@@ -407,7 +484,9 @@ if __name__ == "__main__":
         update()
         exit()
     else:
-        print("Selected: SELECT files")
+        
         #time.sleep(1)
-        autoupdate()
-        main(inp)
+        #autoupdate()
+        if random.randint(0, 10) == 10:
+            plug()
+        home()
