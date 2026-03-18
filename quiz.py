@@ -29,6 +29,8 @@ def home():
             
             Update (u)
             
+            Settings (i)
+
             Quit (q)
 
           """)
@@ -42,8 +44,48 @@ def home():
         update()
     elif opt == "q":
         quit()
+    elif opt == "i":
+        settings()
     else:
         home()
+
+
+def settings():
+    os.system("clear")
+    print("                          Settings \n\n")
+    print("Tired of typing in a lengthy command? \nYou may be eligible for greatness. Introducing 'alias'. Sign below to continue.\n(q to quit)\n\n")
+    signature = input("_________\r")
+    if signature == "q":
+        home()
+    elif len(signature) < 3:
+        print("That's not your fucking name.")
+        quit()
+    os.system("clear")
+    print("        Device Alias \n\n")
+    print("What Operating System are you using? \n")
+    bos = input("Windows (w) \nMacOS (m) \nChromeOS (c) \n> ")
+    name = input("Choose a name for this command: ")
+    if bos == "c":
+        os.system(f"alias {name}='python3 quiz.py start'")
+    elif bos == 'm':
+        #os.system(f"alias {name}='python3 quiz.py start'")
+        print("I can't help you")
+        input()
+    elif bos == 'w':
+        #os.system(f"alias {name}='python3 quiz.py start'")
+        with open("quizAlias.bat", "w") as f:
+            f.write("python3 quiz.py start")
+            f.close()
+    else:
+        print("Invalid option")
+        time.sleep(2)
+        os.system("clear")
+        settings()
+    home()
+
+    
+
+
 
 
 def start():
