@@ -15,6 +15,19 @@ def autoupdate():
     except:
         pass
 
+def update():
+    try:
+        os.system("git pull")
+    except:
+        try:
+            os.chdir("")
+            os.system("git clone https://github.com/Felix-Graham/French-Vocab-Quiz.git")
+        except:
+            os.chdir("")
+            os.system("gh repo clone Felix-Graham/French-Vocab-Quiz")
+    finally:
+        print("Updated (in theory)")
+
 
 
 ############
@@ -80,7 +93,7 @@ def ran_multi(vocab_list):
 ###########
 
 def getfiles(choice):
-    #autoupdate()
+   # autoupdate()
     os.chdir(vocab_location)
     files = os.listdir()
     files = purefiles(files)
@@ -171,7 +184,7 @@ def regular_quiz(num, vocab_list):
         else:
             print("Correct!\n")
         
-        time.sleep(0.5)
+        #time.sleep(0.5)
 
 def continuous_quiz(vocab_list):
     print("Continuous Mode - Press Ctrl+C to exit\n")
@@ -198,7 +211,7 @@ def continuous_quiz(vocab_list):
             else:
                 print("Correct!\n")
             
-            time.sleep(0.3)
+            #time.sleep(0.3)
     except KeyboardInterrupt:
         print("\n\nQuiz ended!")
 
@@ -242,7 +255,7 @@ def multi_choice_quiz(vocab_list, num_questions):
         except:
             print(f"Invalid input. The answer was: {answer}\n")
         
-        time.sleep(0.8)
+        #time.sleep(0.8)
     
     if num_questions == 'max':
         num_questions = int(len(vocab_list)/2)
@@ -299,7 +312,7 @@ def multi_choice_continuous(vocab_list):
         except:
             print(f"Invalid input. The answer was: {answer}\n")
         
-        time.sleep(0.5)
+        #time.sleep(0.5)
     
     try:
         while True:
@@ -388,6 +401,10 @@ if __name__ == "__main__":
     elif inp == "load":
         print("Generating...")
         autoconf()
+        exit()
+    elif inp == "update":
+        print("Updating...")
+        update()
         exit()
     else:
         print("Selected: SELECT files")
