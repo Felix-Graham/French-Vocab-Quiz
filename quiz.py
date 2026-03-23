@@ -2,8 +2,18 @@ import random
 import time
 import os
 import argparse
+import sys
 
+###########
+# Install #
+###########
 
+""" 
+
+Installation is done through either the `install.bat` or `install.sh` files, for windows or chromeOS respectively.
+Currently MacOS is not accounted for due to lack of demand.
+
+"""
 
 ##############
 # menu page  #
@@ -28,8 +38,6 @@ def home():
             Start (s)
             
             Update (u)
-            
-            Settings (i)
 
             Quit (q)
 
@@ -45,7 +53,8 @@ def home():
     elif opt == "q":
         quit()
     elif opt == "i":
-        settings()
+        #settings()
+        pass
     else:
         home()
 
@@ -62,11 +71,24 @@ def settings():
         quit()
     os.system("clear")
     print("        Device Alias \n\n")
+    alias()
+
+
+def alias():
     print("What Operating System are you using? \n")
     bos = input("Windows (w) \nMacOS (m) \nChromeOS (c) \n> ")
+    if bos == 'q':
+        home()
     name = input("Choose a name for this command: ")
+
     if bos == "c":
-        os.system(f"alias {name}='python3 quiz.py start'")
+        bashrc_path = os.path.expanduser("~/.bashrc")
+        script_path = os.path.abspath(sys.argv[0])
+        with open(bashrc_path, "a") as f:
+            f.write(f"\nalias {name}='python3 {script_path}'\n")
+        print(f"Alias '{name}' added. Run 'source ~/.bashrc' or restart your terminal for it to take effect.")
+        input()
+
     elif bos == 'm':
         #os.system(f"alias {name}='python3 quiz.py start'")
         print("I can't help you")
@@ -141,7 +163,7 @@ def update():
             os.chdir("")
             os.system("gh repo clone Felix-Graham/French-Vocab-Quiz")
     finally:
-        print("Updated (in theory)")
+        #print("Updated (in theory)")
         time.sleep(1)
     home()
 
@@ -150,29 +172,29 @@ def update():
 ############
 # autoconf #
 ############
+CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "config.txt")
 
 def autoconf():
-    import sys
     load(10, 0.1)
     homedir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    with open("config.txt", "w") as f:
+    with open(CONFIG_PATH, "w") as f:
         f.write(homedir)
         f.close()
 
 def getconf():
     try:
-        with open("config.txt", "r") as f:
+        with open(CONFIG_PATH, "r") as f:
             l = f.readlines()
-            #print(l)
             f.close()
-            script_location = ''.join(l)
+            script_location = ''.join(l).strip()
             #print(script_location)
-
             vocab_location = script_location+"/vocab"
+            #print(vocab_location)
             return script_location, vocab_location
-    except:
-        print("Config not loaded. Please re-run with 'load' as a keyword")
-
+    except Exception as e:
+        print(f"Config not loaded: {e}. Please re-run with 'load' as a keyword")
+        exit()
+    return None, None
 
 #################
 # miscellaneous #
@@ -211,37 +233,67 @@ def ran_multi(vocab_list):
 
 def getfiles(choice):
    # autoupdate()
+    scritpt_location, vocab_location = getconf()
     os.chdir(vocab_location)
     files = os.listdir()
-    files = purefiles(files)
+    files = sorted(purefiles(files))
     
     if choice == 'all':
         return files
     else:
+
+
+        #for i in range(len(files)):
+            #print(f"{i+1}: {files[i]}")
+
+        prev_prefix = None
         for i in range(len(files)):
+            prefix = files[i].split('-')[0]
+            if prev_prefix is not None and prefix != prev_prefix:
+                print()
             print(f"{i+1}: {files[i]}")
+            prev_prefix = prefix
+
         q = False
         chosenfiles = []
-        print("\nSelect files (enter number), type 'q' when done:")
-        while q == False and (len(files) > 0):
-            selection = input("> ")
-            if selection == 'q':
-                if len(chosenfiles) >= 1:
-                    q = True
-                    break
+
+
+        print("\nSingle (s) or Multiple (m) files?")
+        mode = input("> ")
+
+        if mode == 's':
+            try:
+                selection = int(input("Select file: ")) - 1
+                chosenfiles.append(files[selection])
+            except:
+                print("Invalid selection")
+        else:
+            print("\nSelect files (enter number), type 'q' when done:")
+            while q == False and (len(files) > 0):
+                selection = input("> ")
+                if selection == 'q':
+                    if len(chosenfiles) >= 1:
+                        q = True
+                        break
                 else:
-                    print("You must select at least 1 file")
-            else:
-                try:
-                    selection = int(selection)
-                    chosenfiles.append(files[selection-1])
-                    files.remove(files[selection-1])
-                    os.system("clear")
-                    for i in range(len(files)):
-                        print(f"{i+1}: {files[i]}")
-                except:
-                    print("Invalid selection")
+                    try:
+                        selection = int(selection)
+                        chosenfiles.append(files[selection-1])
+                        files.remove(files[selection-1])
+                        os.system("clear")
+                        prev_prefix = None
+                        for i in range(len(files)):
+                            prefix = files[i].split('-')[0]
+                            if prev_prefix is not None and prefix != prev_prefix:
+                                print()
+                            print(f"{i+1}: {files[i]}")
+                            prev_prefix = prefix
+                    except:
+                        print("Invalid selection")
         return chosenfiles
+
+
+
 
 def purefiles(files):
     clean_files = []
@@ -251,6 +303,7 @@ def purefiles(files):
     return clean_files
 
 def merge(files):
+    script_location, vocab_location = getconf()
     os.chdir(vocab_location)
     total = []
     
@@ -448,10 +501,13 @@ def multi_choice_continuous(vocab_list):
 # main #
 ########
 
-def main(option):
+def main(option, **kwargs):
     os.system("clear")
-    pront("Welcome to French Vocabulary Quiz", 0.05)
-    print()
+    #pront("Welcome to French Vocabulary Quiz", 0.05)
+    
+    opttype = kwargs.get("fromMenu")
+    print("Test")
+    
 
     global script_location
     global vocab_location
@@ -468,10 +524,10 @@ def main(option):
     print(f"\nLoaded {int(len(vocab_list)/2)} vocabulary pairs\n")
     
     # Select quiz type
-    print("Select quiz type:")
-    print("1) Traditional (type answer)")
-    print("2) Multiple choice")
-    quiz_type = input("> ")
+    #print("Select quiz type:")
+    #print("1) Traditional (type answer)")
+    #print("2) Multiple choice")
+    quiz_type = option
     
     # Select mode
     print("\nSelect mode:")

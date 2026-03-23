@@ -22,15 +22,22 @@ Clone the repository and generate the config file. This only needs to be done on
 ```bash
 git clone https://github.com/Felix-Graham/French-Vocab-Quiz.git
 cd French-Vocab-Quiz
-python3 quiz.py load
 ```
 
+If you are using Windows, find the folder which you have just downloaded, and find the install.bat inside of it.
+Double click it to run it, setting up the quiz.
+
+On Chrome OS, open a terminal and navigate using 'ls' (list files where you are) and 'cd' (change directory) commands. Then run the 
+install.sh script with './install.sh'.
+
 ## Usage
+
+Once the installation is complete, open a terminal (or power shell on windows) and type frenchQuiz to start.
 
 ### Menu
 
 ```bash
-python3 quiz.py start
+frenchQuiz
 ```
 
 Opens the home menu with the following options:
@@ -62,23 +69,6 @@ Vocabulary files are plain `.txt` files stored in a `vocab/` subdirectory. Files
 Each file should contain French/English word pairs, one per line, with the French word on even lines and the English translation on odd lines. The first two lines of each file are treated as a header and skipped.
 
 ## Settings — Alias Setup
-
-Running `python3 quiz.py start` every time can get tedious. The settings menu lets you register a short alias so you can launch the quiz with a single word.
-
-Navigate to **Settings (i)** from the home menu and follow the prompts. Supported platforms:
-
-| OS | Method |
-|----|--------|
-| ChromeOS | Appends alias to `~/.bashrc` |
-| Windows | Creates a `quizAlias.bat` file |
-| macOS | Not currently supported |
-
-After setting up on ChromeOS, run the following for the alias to take effect in your current session:
-
-```bash
-source ~/.bashrc
-```
-
 ## Project Structure
 
 ```
