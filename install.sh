@@ -2,15 +2,20 @@
 
 cd /home/$USER/ # go to user home directory
 
-if [ python --version == "Python 3.12.12"]; then
- else 
-    sudo apt install python
-fi 
-python -m ensurepip --upgrade
-pip install -r requirements.text
+# Check if Python 3 is installed, install if not
+if ! command -v python3 &> /dev/null; then
+    sudo apt install -y python3
+fi
 
-python3 /home/$USER/french-quiz/quiz.py load
-alias frenchQuiz = "python3 /home/$USER/french-quiz/quiz.py start"
+python3 -m ensurepip --upgrade
 
-mv install.sh /home/$USER/french-quiz/.install.sh
-mv install.bat /home/$USER/french-quiz/.install.bat
+pip install -r requirements.txt
+
+python3 /home/$USER/French-Vocab-Quiz/quiz.py load
+
+# Write persistent alias to ~/.bashrc
+echo 'alias frenchQuiz="python3 /home/$USER/French-Vocab-Quiz/quiz.py start"' >> /home/$USER/.bashrc
+source /home/$USER/.bashrc
+
+mv install.sh /home/$USER/French-Vocab-Quiz/.install.sh
+mv install.bat /home/$USER/French-Vocab-Quiz/.install.bat
