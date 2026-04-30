@@ -1,4 +1,4 @@
-Vocab Group 1.1 [é, ê, è]
+Vocab Group 1.1 [,é ê, è]
 
 l'amour
 love

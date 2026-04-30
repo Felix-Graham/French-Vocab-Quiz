@@ -1,8 +1,91 @@
 import random
 import time
+import datetime
 import os
 import argparse
 import sys
+import fuzzywuzzy
+from fuzzywuzzy import fuzz
+##################
+# Misc Variables #
+##################
+global configContent
+global streak
+global date 
+global SCORE
+global ansWideRangeActive
+global ansScoreActive
+
+
+
+SCORE = 0
+
+date = (datetime.date.today()).day
+
+with open("config.txt", "r") as f:
+    configContent = f.readlines()
+    configContent = [s.rstrip() for s in configContent]
+    f.close()
+
+###########
+# Streaks #
+###########
+
+def isNewDayToIncrementStreak():
+    updateContent = configContent.index("Streaks")
+
+    #print(configContent[updateContent+3])
+    #print(date)
+    #time.sleep(1)
+
+    if configContent[updateContent+3] == date:
+        return True
+    else:
+        return False
+
+
+def incrementStreak():
+    with open("config.txt", "r") as d:
+        oldContent = d.readlines()
+        d.close()
+    with open("config.txt", "w") as f:
+        niceOldContent = [s.rstrip() for s in oldContent]
+        updateContent = niceOldContent.index("Streaks")
+        #configContent[updateContent+2] = f"{int(configContent[updateContent+2]) + 1}\n\n"
+        streakNum = int(configContent[updateContent+2]) + 1
+        oldContent[updateContent+2] = f"{streakNum}\n"
+        f.writelines(oldContent)
+        print(f"Old Content: {oldContent}")
+        
+        
+
+        f.close()
+
+def killStreak():
+    with open("config.txt", "r") as d:
+        oldContent = d.readlines()
+        d.close()
+    with open("config.txt", "w") as f:
+        niceOldContent = [s.rstrip() for s in oldContent]
+        updateContent = niceOldContent.index("Streaks")
+        #configContent[updateContent+2] = f"{int(configContent[updateContent+2]) + 1}\n\n"
+        streakNum = 0
+        oldContent[updateContent+2] = f"{streakNum}\n"
+        f.writelines(oldContent)
+        print(f"Old Content: {oldContent}")
+
+def getStreak():
+    with open("config.txt", "r") as f:
+        configContent = f.readlines()
+        configContent = [s.rstrip() for s in configContent]
+        updateContent = configContent.index("Streaks")
+        #print(configContent[updateContent+2])
+        f.close()
+    return configContent[updateContent+2]
+
+
+
+
 
 ###########
 # Install #
@@ -29,8 +112,28 @@ def plug():
     os.system("clear")
 
 def home():
+
+    
+
+
+    print(streak)
+    print(isNewDayToIncrementStreak())
+    if isNewDayToIncrementStreak():
+        incrementStreak()
+    else:
+        pass
+
+    updateContent = configContent.index("Streaks")
+    if date -1 > int(configContent[updateContent+3]):
+        killStreak()
+    #print(streak)
+    #time.sleep(5)
+
+
     os.system("clear")
     print("""                      Home                    
+             
+             Streaks: """ + configContent[11] + """
 
 
             Commands (c)
@@ -38,6 +141,8 @@ def home():
             Start (s)
             
             Update (u)
+
+            Settings (i)
 
             Quit (q)
 
@@ -53,15 +158,87 @@ def home():
     elif opt == "q":
         quit()
     elif opt == "i":
-        #settings()
+        settings()
         pass
     else:
         home()
 
+############
+# Settings #
+############
 
 def settings():
     os.system("clear")
     print("                          Settings \n\n")
+
+    print("""                 
+
+            Alias (a)
+
+            Streaks (s)
+            
+            Updates (u)
+
+            Question Settings (e)
+
+            Quit (q)
+
+
+          """)
+    
+    opt = input("\t")
+    if opt == "q":
+        reload()
+        home()
+    elif opt == "a":
+        aliasMenu()
+    elif opt == "s":
+        streaks()
+    elif opt == "u":
+        updateMenu()
+    elif opt == "e":
+        questionSettings()
+    else:
+        settings()
+
+def questionSettings():
+    os.system("clear")
+
+    with open("config.txt", "r+") as f:
+        print("        Question Settings Menu \n\n")
+        #configContent = f.readlines()
+        try:
+            updateContent = configContent.index("Answers")
+            # display current settings 
+            print(f"Answers\nScore\n{configContent[updateContent+1].strip()}\nAnsWideRange\n{configContent[updateContent+3].strip()}\n\n")
+
+            # update settings 
+            print("Score (y/n)")
+            update = input("> ")
+            if update == "y":
+                configContent[updateContent+1] = f"{True}\n"
+            elif update == "n":
+                configContent[updateContent+1] = f"{False}\n"
+
+            print("Accept a Wide Range of Answers (y/n)")
+            update = input("> ")
+            if update == "y":
+                configContent[updateContent+3] = f"{True}\n\n"
+            elif update == "n":
+                configContent[updateContent+3] = f"{False}\n\n"
+
+        except:
+            autoconf(questionSettings)
+          
+        f.close()
+    settings()
+    pass
+
+
+def aliasMenu():
+    os.system("clear")
+    print("        Alias Menu \n\n")
+           
     print("Tired of typing in a lengthy command? \nYou may be eligible for greatness. Introducing 'alias'. Sign below to continue.\n(q to quit)\n\n")
     signature = input("_________\r")
     if signature == "q":
@@ -74,35 +251,100 @@ def settings():
     alias()
 
 
+def streaks():
+    os.system("clear")
+
+    with open("config.txt", "r+") as f:
+        print("        Streaks Menu \n\n")
+        #configContent = f.readlines()
+        updateContent = configContent.index("Streaks")
+        # display current settings 
+        print(f"Streaks\n{configContent[updateContent+1].strip()}\n")
+
+        # update settings 
+        print("Enable Streaks (y/n)")
+        update = input("> ")
+        if update == "y":
+            configContent[updateContent+1] = f"{True}\n\n"
+        elif update == "n":
+            configContent[updateContent+1] = f"{False}\n\n"
+
+        f.close()
+    settings()
+    pass
+
+def updateMenu():
+    os.system("clear")
+
+    with open("config.txt", "r+") as f:
+        print("        Update Menu \n\n")
+        #configContent = f.readlines()
+        try:
+            updateContent = configContent.index("Updates")
+            # display current settings 
+            print(f"Updates\nAlwaysUpdate\n{configContent[updateContent+1].strip()}\nAskBeforeUpdate\n{configContent[updateContent+3].strip()}\n\n")
+
+            # update settings 
+            print("Always Update (y/n)")
+            update = input("> ")
+            if update == "y":
+                configContent[updateContent+1] = f"{True}\n"
+            elif update == "n":
+                configContent[updateContent+1] = f"{False}\n"
+
+            print("Ask Before Update (y/n)")
+            update = input("> ")
+            if update == "y":
+                configContent[updateContent+3] = f"Updates\nAskBeforeUpdate\n{True}\n\n"
+            elif update == "n":
+                configContent[updateContent+3] = f"Updates\nAskBeforeUpdate\n{False}\n\n"
+
+        except:
+            autoconf(updateMenu)
+          
+        f.close()
+    settings()
+    pass
+
 def alias():
-    print("What Operating System are you using? \n")
-    bos = input("Windows (w) \nMacOS (m) \nChromeOS (c) \n> ")
-    if bos == 'q':
-        home()
-    name = input("Choose a name for this command: ")
+    with open("config.txt", "r+") as f:
+        print("What Operating System are you using? \n")
+        bos = input("Windows (w) \nMacOS (m) \nChromeOS (c) \n> ")
+        if bos == 'q':
+            home()
+        name = input("Choose a name for this command: ")
 
-    if bos == "c":
-        bashrc_path = os.path.expanduser("~/.bashrc")
-        script_path = os.path.abspath(sys.argv[0])
-        with open(bashrc_path, "a") as f:
-            f.write(f"\nalias {name}='python3 {script_path}'\n")
-        print(f"Alias '{name}' added. Run 'source ~/.bashrc' or restart your terminal for it to take effect.")
-        input()
+        if bos == "c":
+            bashrc_path = os.path.expanduser("~/.bashrc")
+            script_path = os.path.abspath(sys.argv[0])
+            with open(bashrc_path, "a") as f:
+                f.write(f"\nalias {name}='python3 {script_path}'\n")
+            print(f"Alias '{name}' added. Run 'source ~/.bashrc' or restart your terminal for it to take effect.")
+            input()
+            f.write("""Alias\n
+                    True\n
+                    \n""")
 
-    elif bos == 'm':
-        #os.system(f"alias {name}='python3 quiz.py start'")
-        print("I can't help you")
-        input()
-    elif bos == 'w':
-        #os.system(f"alias {name}='python3 quiz.py start'")
-        with open("quizAlias.bat", "w") as f:
-            f.write("python3 quiz.py start")
+        elif bos == 'm':
+            #os.system(f"alias {name}='python3 quiz.py start'")
+            print("I can't help you")
+            input()
+        elif bos == 'w':
+            #os.system(f"alias {name}='python3 quiz.py start'")
+            with open("quizAlias.bat", "w") as g:
+                g.write("python3 quiz.py start")
+                g.close()
+            f.write("""Alias\n
+                    True\n
+                    \n""")
+
+        else:
+            print("Invalid option")
+            time.sleep(2)
+            os.system("clear")
+            settings()
+
             f.close()
-    else:
-        print("Invalid option")
-        time.sleep(2)
-        os.system("clear")
-        settings()
     home()
 
     
@@ -174,18 +416,48 @@ def update():
 ############
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "config.txt")
 
-def autoconf():
-    load(10, 0.1)
+def autoconf(returnLocation):
     homedir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    with open(CONFIG_PATH, "w") as f:
-        f.write(homedir)
+    #print(homedir)
+    #print(CONFIG_PATH)
+
+    with open(CONFIG_PATH, "r+") as f:
+        f.seek(0)
+        if homedir in configContent:
+            pass
+        else:
+            load(10, 0.1, "Configuring Launch Directory")
+            f.write(f"Directory\n{homedir}\n\n")
+
+        #setting defaults (can be overwritten)
+
+        if "Updates" not in configContent:
+            print("No Updates Found")
+            time.sleep(1)
+            f.write("""Updates\nAlwaysUpdate\nTrue\nAskBeforeUpdate\nFalse\n\n""")
+
+        if "Streaks" not in configContent:
+            f.write(f"""Streaks\nTrue\n0\n{date}\n\n""")
+        
+        if "Alias" not in configContent:
+            f.write("""Alias\nFalse\n\n""")
+
+        if "Answers" not in configContent:
+            f.write("""Answers\nScore\nFalse\nWideRange\nTrue\n\n""")
+
         f.close()
 
+        try:
+            exec(f"{returnLocation}()")
+        except TypeError:
+            home()
+ 
 def getconf():
     try:
         with open(CONFIG_PATH, "r") as f:
             l = f.readlines()
             f.close()
+            l = l[1]
             script_location = ''.join(l).strip()
             #print(script_location)
             vocab_location = script_location+"/vocab"
@@ -195,6 +467,19 @@ def getconf():
         print(f"Config not loaded: {e}. Please re-run with 'load' as a keyword")
         exit()
     return None, None
+
+def reload():
+    with open("config.txt", "r") as f:
+        configContent = f.readlines()
+        configContent = [s.rstrip() for s in configContent]
+        f.close()
+
+    updateContent = configContent.index("Answers")
+    ansWideRange = bool(configContent[updateContent+3])
+    #ansWideRangeActive = bool(configContent[updateContent+3])
+    ansScoreActive = bool(configContent[updateContent+1])
+
+    return configContent, ansWideRange, ansScoreActive
 
 #################
 # miscellaneous #
@@ -207,9 +492,9 @@ def pront(string, t):
         time.sleep(t)
     print()
 
-def load(lnum, speed):
+def load(lnum, speed, text="Loading"):
     for i in range(0, 100+lnum, lnum):
-        print(f"{i}% \r", end="")
+        print(f"{text} {i}% \r", end="")
         time.sleep(speed)
     print("\r    ", end="")
     print("")
@@ -319,11 +604,91 @@ def merge(files):
     
     return total
 
+
+#########
+# Score #
+#########
+
+def incrementScore(SCORE):
+    SCORE += 1
+    return SCORE
+
+
+
+###################
+# Answer Widening #
+###################
+
+replacementList = [
+        ["the ", ""],
+        ["a ", ""],
+        ["an ", ""],
+        ["a ", ""],
+        ["an ", ""],
+        ["and ", ""],
+        ["and ", ""],
+        ["of ", ""],
+        ["for ", ""],
+        ["to ", ""],
+        ["to be ", ""],
+        ]
+
+def fuzzy_widening(ansUser, ansCorrect):
+    ansUser = ansUser.strip().lower()
+    ansCorrect = ansCorrect.strip().lower()
+
+    if fuzzywuzzy.fuzz.ratio(ansUser, ansCorrect) > 80:
+        return True
+    else:
+        return False
+
+
+def answer_widening(ansUser, ansCorrect):
+    ansWideRange = bool(configContent[updateContent+3])
+
+    if ansWideRange:
+        ansUser = ansUser.strip().lower()
+        ansCorrect = ansCorrect.strip().lower()
+
+        for i in range(len(replacementList)):
+            try:
+                ansUser = ansUser.replace(replacementList[i][0], replacementList[i][1])
+                ansCorrect = ansCorrect.replace(replacementList[i][0], replacementList[i][1])
+            except:
+                pass
+            
+        
+        fuzzyCorrect = fuzzywuzzy.fuzz.ratio(ansUser, ansCorrect)
+        
+
+        print(f"Fuzzy correct: {fuzzyCorrect}")
+        if ansUser == ansCorrect:
+            return True
+        elif fuzzyCorrect > 80:
+            return True
+        else:
+            return False
+
+    else:
+        if ansUser.strip().lower() != ansCorrect.strip().lower():
+            return False
+        elif ansUser.strip().lower() == ansCorrect.strip().lower():
+            return True
+        else:
+            return True
+
+
+    
+
+
 #################
 # quizing/modes #
 #################
 
+SCORE = 0
+
 def regular_quiz(num, vocab_list):
+    SCORE = 0
     vocab_copy = vocab_list.copy()
     questions_asked = 0
     
@@ -349,15 +714,20 @@ def regular_quiz(num, vocab_list):
         print(f"Question {i+1}: Translate '{vocab_copy[r-1]}'")
         ans = input("Answer: ")
         
-        if ans.strip().lower() != vocab_copy[r].strip().lower():
+        #if ans.strip().lower() != vocab_copy[r].strip().lower():
+        if not answer_widening(ans, vocab_copy[r]):
             print(f"Incorrect. Correct answer: {vocab_copy[r]}\n")
         else:
             print("Correct!\n")
+            if ansScoreActive:
+                SCORE = incrementScore(SCORE)
+                print(f"Score: {SCORE}\n")
         
         #time.sleep(0.5)
     home()
 
 def continuous_quiz(vocab_list):
+    SCORE = 0
     print("Continuous Mode - Press Ctrl+C to exit\n")
     
     try:
@@ -377,10 +747,14 @@ def continuous_quiz(vocab_list):
             print(f"Translate '{vocab_copy[r-1]}'")
             ans = input("Answer: ")
             
-            if ans.strip().lower() != vocab_copy[r].strip().lower():
+#            if ans.strip().lower() != vocab_copy[r].strip().lower():
+            if not answer_widening(ans, vocab_copy[r]):
                 print(f"Incorrect. Correct answer: {vocab_copy[r]}\n")
             else:
                 print("Correct!\n")
+                if ansScoreActive:
+                    SCORE = incrementScore(SCORE)
+                    print(f"Score: {SCORE}\n")
             
             #time.sleep(0.3)
     except KeyboardInterrupt:
@@ -388,7 +762,7 @@ def continuous_quiz(vocab_list):
         home()
 
 def multi_choice_quiz(vocab_list, num_questions):
-    
+    SCORE = 0
     def get_qa_pair(questions):
         # find q & a for mchoice
         r = ran_multi(questions)
@@ -411,6 +785,7 @@ def multi_choice_quiz(vocab_list, num_questions):
         return wrong
     
     def display_question(question, options, answer):
+        SCORE =0
         print(f"\nWhat is the translation of '{question}'?\n")
         for i in range(len(options)):
             print(f"{i+1}) {options[i]}")
@@ -420,6 +795,9 @@ def multi_choice_quiz(vocab_list, num_questions):
             if 1 <= guess <= len(options):
                 if options[guess-1] == answer:
                     print("Correct!\n")
+                    if ansScoreActive:
+                        SCORE = incrementScore(SCORE)
+                        print(f"Score: {SCORE}\n")
                 else:
                     print(f"Incorrect. The answer was: {answer}\n")
             else:
@@ -446,6 +824,7 @@ def multi_choice_quiz(vocab_list, num_questions):
         display_question(question, options, answer)
 
 def multi_choice_continuous(vocab_list):
+    SCORE = 0
     print("Multiple Choice Continuous Mode - Press Ctrl+C to exit\n")
     
     def get_qa_pair(questions):
@@ -468,6 +847,7 @@ def multi_choice_continuous(vocab_list):
         return wrong
     
     def display_question(question, options, answer):
+        SCORE =0
         print(f"\nWhat is the translation of '{question}'?\n")
         for i in range(len(options)):
             print(f"{i+1}) {options[i]}")
@@ -477,6 +857,10 @@ def multi_choice_continuous(vocab_list):
             if 1 <= guess <= len(options):
                 if options[guess-1] == answer:
                     print("Correct!\n")
+                    if ansScoreActive:
+                        SCORE = incrementScore(SCORE)
+                        
+                        print(f"Score: {SCORE}\n")
                 else:
                     print(f"Incorrect. The answer was: {answer}\n")
             else:
@@ -496,6 +880,54 @@ def multi_choice_continuous(vocab_list):
             display_question(question, options, answer)
     except KeyboardInterrupt:
         print("\n\nQuiz ended!")
+
+
+def timedQuiz(Mtime, Stime, vocab_list):
+    # Time as int minutes/seconds. 
+    # Set time as var clock  
+    # while clockMins < time:
+    import time
+    SCORE = 0
+   
+    clockSecsStart = int(time.perf_counter())
+    currentTime = int(Mtime * 60 + Stime)
+   
+    while int(time.perf_counter() - clockSecsStart) < currentTime:
+         vocab_copy = vocab_list.copy()
+         if len(vocab_copy) < 2:
+             break
+            
+         r = ran(len(vocab_copy), vocab_copy)
+         if r >= len(vocab_copy):
+             r = len(vocab_copy) - 1
+             if r % 2 == 0:
+                 r -= 1
+            
+         # r - English; r-1 - french
+         # Ask french, expect English answer
+         print(f"Translate '{vocab_copy[r-1]}'")
+         ans = input("Answer: ")
+        
+#         if ans.strip().lower() != vocab_copy[r].strip().lower():
+         if not answer_widening(ans, vocab_copy[r]):
+             print(f"Incorrect. Correct answer: {vocab_copy[r]}\n")
+         else:
+             print("Correct!\n")
+             if ansScoreActive:
+                SCORE = incrementScore(SCORE)
+                
+                print(f"Score: {SCORE}\n")
+         remaining = currentTime - int(time.perf_counter() - clockSecsStart)
+         if remaining < 0:
+             remaining = 0
+             break 
+         print(f"Time remaining: {remaining//60}:{remaining%60} seconds")
+
+    print("\n\nQuiz ended!")
+    time.sleep(1)
+    home()
+
+       
 
 ########
 # main #
@@ -534,6 +966,7 @@ def main(option, **kwargs):
     print("1) Continuous")
     print("2) Set number of questions")
     print("3) Maximum (all questions)")
+    print("4) Timed Quiz")
     mode = input("> ")
     
     os.system("clear")
@@ -543,9 +976,15 @@ def main(option, **kwargs):
             continuous_quiz(vocab_list)
         elif mode == "3":  # Max
             regular_quiz('max', vocab_list)
+        elif mode == "4":
+            Mtime = int(input("Minutes: "))
+            Stime = int(input("Seconds: "))
+            timedQuiz(Mtime, Stime, vocab_list)
         else:  # Set number
             num = input("How many questions? ")
             regular_quiz(num, vocab_list)
+            
+
     
     elif quiz_type == "2":  # Multiple choice
         if mode == "1":  # Continuous
@@ -555,7 +994,7 @@ def main(option, **kwargs):
         else:  # Set number
             num = input("How many questions? ")
             multi_choice_quiz(vocab_list, num)
-    
+    time.sleep(1)
     print("\nThank you for practicing!")
 
 ###########
@@ -563,6 +1002,23 @@ def main(option, **kwargs):
 ###########
 
 if __name__ == "__main__":
+
+    try:
+        updateContent = configContent.index("Streaks")
+        streak = int(configContent[updateContent+2])
+    except:
+        autoconf(home)
+
+    try:
+        updateContent = configContent.index("Answers")
+        ansWideRange = bool(configContent[updateContent+3])
+        #ansWideRangeActive = bool(configContent[updateContent+3])
+        ansScoreActive = bool(configContent[updateContent+1])
+    except:
+        autoconf(home)
+
+
+
     parser = argparse.ArgumentParser(description='French Vocabulary Quiz')
     parser.add_argument('option', help="'all' to use all files, or 'select' to choose files")
     args = parser.parse_args()
@@ -575,7 +1031,7 @@ if __name__ == "__main__":
         main(inp)
     elif inp == "load":
         print("Generating...")
-        autoconf()
+        autoconf(None)
         exit()
     elif inp == "update":
         print("Updating...")
@@ -587,4 +1043,5 @@ if __name__ == "__main__":
         #autoupdate()
         if random.randint(0, 10) == 10:
             plug()
+        autoconf(None)
         home()
