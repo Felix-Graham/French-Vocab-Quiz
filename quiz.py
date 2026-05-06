@@ -204,35 +204,33 @@ def settings():
 def questionSettings():
     os.system("clear")
 
-    with open("config.txt", "r+") as f:
-        print("        Question Settings Menu \n\n")
-        #configContent = f.readlines()
-        try:
-            updateContent = configContent.index("Answers")
-            # display current settings 
-            print(f"Answers\nScore\n{configContent[updateContent+1].strip()}\nAnsWideRange\n{configContent[updateContent+3].strip()}\n\n")
+    print("        Question Settings Menu \n\n")
+    try:
+        updateContent = configContent.index("Answers")
+        # display current settings
+        print(f"Score: {configContent[updateContent+2].strip()}\nWide Range: {configContent[updateContent+4].strip()}\n\n")
 
-            # update settings 
-            print("Score (y/n)")
-            update = input("> ")
-            if update == "y":
-                configContent[updateContent+1] = f"{True}\n"
-            elif update == "n":
-                configContent[updateContent+1] = f"{False}\n"
+        print("Score (y/n)")
+        update = input("> ")
+        if update == "y":
+            configContent[updateContent+2] = "True"
+        elif update == "n":
+            configContent[updateContent+2] = "False"
 
-            print("Accept a Wide Range of Answers (y/n)")
-            update = input("> ")
-            if update == "y":
-                configContent[updateContent+3] = f"{True}\n\n"
-            elif update == "n":
-                configContent[updateContent+3] = f"{False}\n\n"
+        print("Accept a Wide Range of Answers (y/n)")
+        update = input("> ")
+        if update == "y":
+            configContent[updateContent+4] = "True"
+        elif update == "n":
+            configContent[updateContent+4] = "False"
 
-        except:
-            autoconf(questionSettings)
-          
-        f.close()
+        with open("config.txt", "w") as f:
+            f.write("\n".join(configContent) + "\n")
+
+    except ValueError:
+        autoconf(questionSettings)
+
     settings()
-    pass
 
 
 def aliasMenu():
@@ -254,24 +252,22 @@ def aliasMenu():
 def streaks():
     os.system("clear")
 
-    with open("config.txt", "r+") as f:
-        print("        Streaks Menu \n\n")
-        #configContent = f.readlines()
-        updateContent = configContent.index("Streaks")
-        # display current settings 
-        print(f"Streaks\n{configContent[updateContent+1].strip()}\n")
+    print("        Streaks Menu \n\n")
+    updateContent = configContent.index("Streaks")
+    # display current settings
+    print(f"Streaks enabled: {configContent[updateContent+1].strip()}\n")
 
-        # update settings 
-        print("Enable Streaks (y/n)")
-        update = input("> ")
-        if update == "y":
-            configContent[updateContent+1] = f"{True}\n\n"
-        elif update == "n":
-            configContent[updateContent+1] = f"{False}\n\n"
+    print("Enable Streaks (y/n)")
+    update = input("> ")
+    if update == "y":
+        configContent[updateContent+1] = "True"
+    elif update == "n":
+        configContent[updateContent+1] = "False"
 
-        f.close()
+    with open("config.txt", "w") as f:
+        f.write("\n".join(configContent) + "\n")
+
     settings()
-    pass
 
 def updateMenu():
     os.system("clear")
@@ -469,17 +465,17 @@ def getconf():
     return None, None
 
 def reload():
+    global configContent, ansWideRangeActive, ansScoreActive
     with open("config.txt", "r") as f:
         configContent = f.readlines()
         configContent = [s.rstrip() for s in configContent]
         f.close()
 
     updateContent = configContent.index("Answers")
-    ansWideRange = bool(configContent[updateContent+3])
-    #ansWideRangeActive = bool(configContent[updateContent+3])
-    ansScoreActive = bool(configContent[updateContent+1])
+    ansWideRangeActive = configContent[updateContent+4].strip() == "True"
+    ansScoreActive = configContent[updateContent+2].strip() == "True"
 
-    return configContent, ansWideRange, ansScoreActive
+    return configContent, ansWideRangeActive, ansScoreActive
 
 #################
 # miscellaneous #
@@ -633,49 +629,39 @@ replacementList = [
         ["to be ", ""],
         ]
 
-def fuzzy_widening(ansUser, ansCorrect):
+def validate_answer(ansUser, ansCorrect):
+    """
+    Validates a typed answer against the correct answer.
+    Consults config for:
+      - WideRange (offset +4): strips articles/prepositions and applies fuzzy matching
+      - Score    (offset +2): used externally via ansScoreActive global
+    Returns True if the answer is accepted, False otherwise.
+    """
+    try:
+        updateContent = configContent.index("Answers")
+        wide_range = configContent[updateContent+4].strip() == "True"
+    except (ValueError, IndexError):
+        wide_range = False
+
     ansUser = ansUser.strip().lower()
     ansCorrect = ansCorrect.strip().lower()
 
-    if fuzzywuzzy.fuzz.ratio(ansUser, ansCorrect) > 80:
+    if ansUser == ansCorrect:
         return True
-    else:
-        return False
 
+    if wide_range:
+        for old, new in replacementList:
+            ansUser = ansUser.replace(old, new)
+            ansCorrect = ansCorrect.replace(old, new)
 
-def answer_widening(ansUser, ansCorrect):
-    ansWideRange = bool(configContent[updateContent+3])
-
-    if ansWideRange:
-        ansUser = ansUser.strip().lower()
-        ansCorrect = ansCorrect.strip().lower()
-
-        for i in range(len(replacementList)):
-            try:
-                ansUser = ansUser.replace(replacementList[i][0], replacementList[i][1])
-                ansCorrect = ansCorrect.replace(replacementList[i][0], replacementList[i][1])
-            except:
-                pass
-            
-        
-        fuzzyCorrect = fuzzywuzzy.fuzz.ratio(ansUser, ansCorrect)
-        
-
-        print(f"Fuzzy correct: {fuzzyCorrect}")
         if ansUser == ansCorrect:
             return True
-        elif fuzzyCorrect > 80:
-            return True
-        else:
-            return False
 
-    else:
-        if ansUser.strip().lower() != ansCorrect.strip().lower():
-            return False
-        elif ansUser.strip().lower() == ansCorrect.strip().lower():
-            return True
-        else:
-            return True
+        fuzzy_score = fuzzywuzzy.fuzz.ratio(ansUser, ansCorrect)
+        print(f"Fuzzy score: {fuzzy_score}")
+        return fuzzy_score > 80
+
+    return False
 
 
     
@@ -715,7 +701,7 @@ def regular_quiz(num, vocab_list):
         ans = input("Answer: ")
         
         #if ans.strip().lower() != vocab_copy[r].strip().lower():
-        if not answer_widening(ans, vocab_copy[r]):
+        if not validate_answer(ans, vocab_copy[r]):
             print(f"Incorrect. Correct answer: {vocab_copy[r]}\n")
         else:
             print("Correct!\n")
@@ -748,7 +734,7 @@ def continuous_quiz(vocab_list):
             ans = input("Answer: ")
             
 #            if ans.strip().lower() != vocab_copy[r].strip().lower():
-            if not answer_widening(ans, vocab_copy[r]):
+            if not validate_answer(ans, vocab_copy[r]):
                 print(f"Incorrect. Correct answer: {vocab_copy[r]}\n")
             else:
                 print("Correct!\n")
@@ -909,7 +895,7 @@ def timedQuiz(Mtime, Stime, vocab_list):
          ans = input("Answer: ")
         
 #         if ans.strip().lower() != vocab_copy[r].strip().lower():
-         if not answer_widening(ans, vocab_copy[r]):
+         if not validate_answer(ans, vocab_copy[r]):
              print(f"Incorrect. Correct answer: {vocab_copy[r]}\n")
          else:
              print("Correct!\n")
@@ -1011,9 +997,8 @@ if __name__ == "__main__":
 
     try:
         updateContent = configContent.index("Answers")
-        ansWideRange = bool(configContent[updateContent+3])
-        #ansWideRangeActive = bool(configContent[updateContent+3])
-        ansScoreActive = bool(configContent[updateContent+1])
+        ansWideRangeActive = configContent[updateContent+4].strip() == "True"
+        ansScoreActive = configContent[updateContent+2].strip() == "True"
     except:
         autoconf(home)
 
