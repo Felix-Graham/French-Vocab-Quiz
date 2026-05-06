@@ -22,7 +22,7 @@ SCORE = 0
 
 date = (datetime.date.today()).day
 
-with open("config.txt", "r") as f:
+with open(".config.txt", "r") as f:
     configContent = f.readlines()
     configContent = [s.rstrip() for s in configContent]
     f.close()
@@ -45,10 +45,10 @@ def isNewDayToIncrementStreak():
 
 
 def incrementStreak():
-    with open("config.txt", "r") as d:
+    with open(".config.txt", "r") as d:
         oldContent = d.readlines()
         d.close()
-    with open("config.txt", "w") as f:
+    with open(".config.txt", "w") as f:
         niceOldContent = [s.rstrip() for s in oldContent]
         updateContent = niceOldContent.index("Streaks")
         #configContent[updateContent+2] = f"{int(configContent[updateContent+2]) + 1}\n\n"
@@ -62,10 +62,10 @@ def incrementStreak():
         f.close()
 
 def killStreak():
-    with open("config.txt", "r") as d:
+    with open(".config.txt", "r") as d:
         oldContent = d.readlines()
         d.close()
-    with open("config.txt", "w") as f:
+    with open(".config.txt", "w") as f:
         niceOldContent = [s.rstrip() for s in oldContent]
         updateContent = niceOldContent.index("Streaks")
         #configContent[updateContent+2] = f"{int(configContent[updateContent+2]) + 1}\n\n"
@@ -75,7 +75,7 @@ def killStreak():
         print(f"Old Content: {oldContent}")
 
 def getStreak():
-    with open("config.txt", "r") as f:
+    with open(".config.txt", "r") as f:
         configContent = f.readlines()
         configContent = [s.rstrip() for s in configContent]
         updateContent = configContent.index("Streaks")
@@ -224,7 +224,7 @@ def questionSettings():
         elif update == "n":
             configContent[updateContent+4] = "False"
 
-        with open("config.txt", "w") as f:
+        with open(".config.txt", "w") as f:
             f.write("\n".join(configContent) + "\n")
 
     except ValueError:
@@ -264,7 +264,7 @@ def streaks():
     elif update == "n":
         configContent[updateContent+1] = "False"
 
-    with open("config.txt", "w") as f:
+    with open(".config.txt", "w") as f:
         f.write("\n".join(configContent) + "\n")
 
     settings()
@@ -272,7 +272,7 @@ def streaks():
 def updateMenu():
     os.system("clear")
 
-    with open("config.txt", "r+") as f:
+    with open(".config.txt", "r+") as f:
         print("        Update Menu \n\n")
         #configContent = f.readlines()
         try:
@@ -303,7 +303,7 @@ def updateMenu():
     pass
 
 def alias():
-    with open("config.txt", "r+") as f:
+    with open(".config.txt", "r+") as f:
         print("What Operating System are you using? \n")
         bos = input("Windows (w) \nMacOS (m) \nChromeOS (c) \n> ")
         if bos == 'q':
@@ -410,7 +410,7 @@ def update():
 ############
 # autoconf #
 ############
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "config.txt")
+CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), ".config.txt")
 
 def autoconf(returnLocation):
     homedir = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -466,7 +466,7 @@ def getconf():
 
 def reload():
     global configContent, ansWideRangeActive, ansScoreActive
-    with open("config.txt", "r") as f:
+    with open(".config.txt", "r") as f:
         configContent = f.readlines()
         configContent = [s.rstrip() for s in configContent]
         f.close()
