@@ -10,7 +10,9 @@ Rem should install pip (for python module dependencies)
 
 pip install -r requirements.txt
 
+touch C:\Users\%username%\French-Vocab-Quiz\.config.txt
 python C:\Users\%username%\French-Vocab-Quiz\quiz.py load
+
 
 doskey frenchQuiz=python C:\Users\%username%\French-Vocab-Quiz\quiz.py start
 

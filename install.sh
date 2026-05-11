@@ -11,6 +11,7 @@ python3 -m ensurepip --upgrade
 
 pip install -r requirements.txt
 
+touch /home/$USER/French-Vocab-Quiz/.config.txt
 python3 /home/$USER/French-Vocab-Quiz/quiz.py load
 
 # Write persistent alias to ~/.bashrc
